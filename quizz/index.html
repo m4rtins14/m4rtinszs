@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizz Interativo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="smatphone.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quizz</h1>
+        <div class="question">
+            <p id="question-text">Pergunta 1: Qual é a capital do Brasil?</p>
+            
+            <ul id="options">
+                <li class="option">a) São Paulo</li>
+                <li class="option">b) Rio de Janeiro</li>
+                <li class="option">c) Brasília</li>
+                <li class="option">d) Belo Horizonte</li>
+            </ul>
+        </div>
+        <button id="submit-answer">Responder</button>
+        <button id="restart-quiz" style="display: none;">Recomeçar Quizz</button>
+        <p id="message"></p>
+        <p id="score">Pontuação: 0</p>
+    </div>
+    <script>
+
+
+const questions = [
+    {
+        question: 'Qual é a capital do Brasil?',
+        image: 'brasiliaa.jpg',
+        options: ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Belo Horizonte'],
+        correctAnswer: 2,
+        points: 10
+    },
+
+    {
+        question: 'Quanto é 51x25/2?',
+        image: 'matematica.png',
+        options: ['637.5', '1233', '2354.6', '4321'],
+        correctAnswer: 0,
+        points: 10
+    },
+
+    {
+        question: 'Sobre o classicismo é correto afirmar:',
+        image: 'classicismo.jpg',
+        options: ['Movimento que faz referência aos modelos clássicos greco-romanos.', 'Presença de poemas com versos livres e brancos', 'Memorial de Aires é um exemplo de romance classicista.', 'Movimento que surge no século V na Europa.'],
+        correctAnswer: 0,
+        points: 10
+    },
+
+    {
+        question: 'Um dos maiores autores de língua portuguesa, Luís Vaz de Camões, escreveu obras no período classicista. Uma delas que se destaca é',
+        image: 'luizvaz.jpg',
+        options: ['Odisseia', 'Eneida', 'A Guerra de Troia', 'Os Lusíadas'],
+        correctAnswer: 3,
+        points: 10
+    },
+
+    {
+        question: 'O número que devemos somar aos termos da fração 9/19, para se obter a fração 3/5 é:',
+        image: 'matematica2.jpg',
+        options: ['16.', '6.', '10.', '17.'],
+        correctAnswer: 1,
+        points: 10
+    },
+
+
+];
+
+const questionText = document.getElementById('question-text');
+const options = document.querySelectorAll('.option');
+const submitAnswerButton = document.getElementById('submit-answer');
+const message = document.getElementById('message');
+const scoreElement = document.getElementById('score');
+
+
+let currentQuestionIndex = 0;
+let chances = 2;
+let score = 0;
+
+
+function displayQuestion() {
+    const currentQuestion = questions[currentQuestionIndex];
+    questionText.textContent = `Pergunta ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+    
+    
+    const image = document.createElement('img');
+    image.src = currentQuestion.image;
+    image.alt = currentQuestion.question;
+    image.style.maxWidth = '100%';
+    image.style.marginTop = '10px';
+    const questionContainer = document.querySelector('.question');
+    questionContainer.insertBefore(image, questionContainer.firstChild);
+
+    options.forEach((option, index) => {
+        option.textContent = currentQuestion.options[index];
+    });
+}
+
+
+function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (selectedIndex === currentQuestion.correctAnswer) {
+        score += currentQuestion.points;
+        scoreElement.textContent = `Pontuação: ${score}`;
+        message.textContent = 'Resposta correta!';
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            displayQuestion();
+        } else {
+            questionText.textContent = 'Parabéns, você completou o quizz!';
+            options.forEach(option => option.style.display = 'none');
+            submitAnswerButton.style.display = 'none';
+        }
+    } else {
+        chances--;
+
+        if (chances === 0) {
+            questionText.textContent = 'Você errou todas as chances. Recomece o quizz.';
+            options.forEach(option => option.style.display = 'none');
+            submitAnswerButton.style.display = 'none';
+        } else {
+            message.textContent = 'Resposta incorreta. Tente novamente.';
+        }
+    }
+}
+
+const questionImage = document.createElement('img');
+questionImage.style.maxWidth = '100%';
+questionImage.style.height = 'auto';
+questionImage.style.marginTop = '10px';
+const questionContainer = document.querySelector('.question');
+questionContainer.appendChild(questionImage); // Mudança aqui
+
+function displayQuestion() {
+    const currentQuestion = questions[currentQuestionIndex];
+    questionText.textContent = `Pergunta ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+    
+    questionImage.src = currentQuestion.image;
+    questionImage.alt = currentQuestion.question;
+
+    options.forEach((option, index) => {
+        option.textContent = currentQuestion.options[index];
+    });
+}
+
+
+displayQuestion();
+
+submitAnswerButton.addEventListener('click', () => {
+    const selectedOptionIndex = Array.from(options).findIndex(option => option.classList.contains('selected'));
+    if (selectedOptionIndex !== -1) {
+        checkAnswer(selectedOptionIndex);
+    } else {
+        message.textContent = 'Selecione uma opção antes de responder.';
+    }
+});
+
+options.forEach((option, index) => {
+    option.addEventListener('click', () => {
+        options.forEach(option => option.classList.remove('selected'));
+        option.classList.add('selected');
+    });
+});
+
+
+const restartButton = document.getElementById('restart-quiz');
+
+
+function restartQuiz() {
+    currentQuestionIndex = 0;
+    chances = 2;
+    score = 0;
+    message.textContent = '';
+    scoreElement.textContent = 'Pontuação: 0';
+    displayQuestion();
+    options.forEach(option => option.style.display = 'list-item');
+    submitAnswerButton.style.display = 'block';
+    restartButton.style.display = 'none';
+}
+
+
+restartButton.addEventListener('click', restartQuiz);
+    </script>
+</body>
+</html>
